@@ -280,38 +280,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   if (loading) {
     return (
       <div className="admin-layout">
-        {/* Skeleton Sidebar */}
-        <aside className="sidebar">
-          <div className="sidebar-logo">
-            <div className="skeleton" style={{ width: 40, height: 40, borderRadius: 'var(--radius-sm)' }} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <div className="skeleton" style={{ width: 120, height: 14 }} />
-              <div className="skeleton" style={{ width: 80, height: 10 }} />
-            </div>
-          </div>
-          <nav className="sidebar-nav" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {Array.from({ length: 3 }).map((_, secIdx) => (
-              <div key={secIdx} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div className="skeleton" style={{ width: 80, height: 10, margin: '0 20px' }} />
-                {Array.from({ length: secIdx === 1 ? 6 : 3 }).map((_, itemIdx) => (
-                  <div key={itemIdx} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 20px' }}>
-                    <div className="skeleton" style={{ width: 18, height: 18, borderRadius: 4 }} />
-                    <div className="skeleton" style={{ width: 100, height: 12 }} />
-                  </div>
-                ))}
-              </div>
-            ))}
-          </nav>
-          <div className="sidebar-footer">
-            <div className="sidebar-user">
-              <div className="skeleton" style={{ width: 32, height: 32, borderRadius: '50%' }} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <div className="skeleton" style={{ width: 80, height: 12 }} />
-                <div className="skeleton" style={{ width: 60, height: 10 }} />
-              </div>
-            </div>
-          </div>
-        </aside>
+        <Sidebar user={null} loading={true} />
 
         {/* Skeleton Main Panel */}
         <div className="admin-main">

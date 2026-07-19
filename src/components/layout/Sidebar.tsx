@@ -40,9 +40,10 @@ const navItems = [
 
 interface SidebarProps {
   user: User | null;
+  loading?: boolean;
 }
 
-export function Sidebar({ user }: SidebarProps) {
+export function Sidebar({ user, loading }: SidebarProps) {
   const pathname = usePathname();
 
   const initials = user?.name
@@ -85,10 +86,23 @@ export function Sidebar({ user }: SidebarProps) {
 
       <div className="sidebar-footer">
         <div className="sidebar-user">
-          <div className="sidebar-avatar">{initials}</div>
+          {loading ? (
+            <div className="skeleton" style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0 }} />
+          ) : (
+            <div className="sidebar-avatar">{initials}</div>
+          )}
           <div className="sidebar-user-info">
-            <div className="sidebar-user-name">{user?.name ?? 'Admin'}</div>
-            <div className="sidebar-user-role">Administrator</div>
+            {loading ? (
+              <>
+                <div className="skeleton" style={{ width: 80, height: 12, marginBottom: 4 }} />
+                <div className="skeleton" style={{ width: 60, height: 10 }} />
+              </>
+            ) : (
+              <>
+                <div className="sidebar-user-name">{user?.name ?? 'Admin'}</div>
+                <div className="sidebar-user-role">Administrator</div>
+              </>
+            )}
           </div>
         </div>
       </div>
