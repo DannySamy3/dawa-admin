@@ -119,8 +119,10 @@ export const adminApi = {
   getPendingRequests: () => api.get('/admin/requests/pending'),
 
   // Posts / Advertisements
-  getPosts: (page = 1, limit = 20) => api.get(`/admin/posts?page=${page}&limit=${limit}`),
+  getPosts: (page = 1, limit = 20, role?: string, sortBy?: string) =>
+    api.get(`/admin/posts?page=${page}&limit=${limit}${role && role !== 'ALL' ? `&role=${role}` : ''}${sortBy ? `&sortBy=${sortBy}` : ''}`),
   deletePost: (id: string) => api.delete(`/admin/posts/${id}`),
+  bulkDeletePosts: (ids: string[]) => Promise.all(ids.map(id => api.delete(`/admin/posts/${id}`))),
 };
 
 export const healthApi = {

@@ -59,6 +59,9 @@ export interface BaseBusinessProfile {
   directorId?: string | null;
   bankStatement?: string | null;
   buildingPicture?: string | null;
+  country?: string | null;
+  city?: string | null;
+  physicalAddress?: string | null;
 }
 
 // ─── Importer ────────────────────────────────────────────────────────────────

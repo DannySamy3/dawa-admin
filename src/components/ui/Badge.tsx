@@ -1,13 +1,14 @@
-type BadgeVariant = 'active' | 'inactive' | 'pending' | 'primary' | 'info' | 'success' | 'danger' | 'warning';
+type BadgeVariant = 'active' | 'inactive' | 'pending' | 'primary' | 'secondary' | 'info' | 'success' | 'danger' | 'warning';
 
 interface BadgeProps {
   variant?: BadgeVariant;
   children: React.ReactNode;
+  style?: React.CSSProperties;
 }
 
-export function Badge({ variant = 'primary', children }: BadgeProps) {
+export function Badge({ variant = 'primary', children, style }: BadgeProps) {
   return (
-    <span className={`badge badge-${variant}`}>{children}</span>
+    <span className={`badge badge-${variant}`} style={style}>{children}</span>
   );
 }
 
