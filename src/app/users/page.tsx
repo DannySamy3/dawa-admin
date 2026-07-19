@@ -9,7 +9,7 @@ import { roleBadge, statusBadge } from '@/components/ui/Badge';
 import { adminApi } from '@/lib/api';
 import type { User } from '@/lib/types';
 
-const ROLES = ['ALL', 'ADMIN', 'IMPORTER', 'DISTRIBUTOR', 'MANUFACTURER', 'INSTITUTION', 'COMMUNITY'];
+const ROLES = ['ALL', 'ADMIN', 'IMPORTER', 'DISTRIBUTOR', 'MANUFACTURER', 'INSTITUTION', 'COMMUNITY', 'ORGANICSSUPPLEMENT'];
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
