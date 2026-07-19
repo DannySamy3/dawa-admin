@@ -6,9 +6,11 @@ import { ShieldCheck, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { authApi } from '@/lib/api';
 import { setTokens } from '@/lib/auth';
 import type { User } from '@/lib/types';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { fetchMe } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
@@ -27,7 +29,8 @@ export default function LoginPage() {
         return;
       }
       setTokens(data.accessToken, data.refreshToken);
-      router.push('/dashboard');
+      await fetchMe();
+      router.replace('/dashboard');
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
