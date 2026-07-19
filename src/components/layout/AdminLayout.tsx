@@ -15,6 +15,7 @@ const PAGE_META: Record<string, { title: string; subtitle: string }> = {
   '/manufacturers': { title: 'Manufacturers', subtitle: 'Manufacturer company profiles' },
   '/institutions': { title: 'Institutions', subtitle: 'Pharmacies, hospitals and clinics' },
   '/community': { title: 'Community', subtitle: 'Professional verifications' },
+  '/organics': { title: 'Organics & Supplements', subtitle: 'Organics & supplements company profiles' },
   '/settings': { title: 'Settings', subtitle: 'Account and preferences' },
 };
 
@@ -58,7 +59,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           <>
             {/* Stat Cards */}
             <div className="stat-grid">
-              {Array.from({ length: 6 }).map((_, i) => (
+              {Array.from({ length: 7 }).map((_, i) => (
                 <div key={i} className="stat-card">
                   <div className="stat-card-header">
                     <div className="stat-card-label" style={{ display: 'block', width: '60%' }}>

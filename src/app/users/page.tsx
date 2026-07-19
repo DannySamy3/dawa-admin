@@ -19,14 +19,27 @@ export default function UsersPage() {
   const [total, setTotal] = useState(0);
   const [roleFilter, setRoleFilter] = useState('ALL');
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [toggling, setToggling] = useState<string | null>(null);
   const LIMIT = 10;
 
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [search]);
+
   const loadUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await adminApi.getUsers(page, LIMIT, roleFilter === 'ALL' ? undefined : roleFilter);
+      const { data } = await adminApi.getUsers(
+        page,
+        LIMIT,
+        roleFilter === 'ALL' ? undefined : roleFilter,
+        debouncedSearch || undefined
+      );
       const list: User[] = data.users ?? data.data ?? data ?? [];
       const pagination = data.pagination;
       setUsers(list);
@@ -35,10 +48,10 @@ export default function UsersPage() {
     } catch { /* silent */ } finally {
       setLoading(false);
     }
-  }, [page, roleFilter]);
+  }, [page, roleFilter, debouncedSearch]);
 
   useEffect(() => { loadUsers(); }, [loadUsers]);
-  useEffect(() => { setPage(1); }, [roleFilter]);
+  useEffect(() => { setPage(1); }, [roleFilter, debouncedSearch]);
 
   const handleToggle = async (userId: string) => {
     setToggling(userId);
@@ -48,12 +61,6 @@ export default function UsersPage() {
       if (selectedUser?.id === userId) setSelectedUser((prev) => prev ? { ...prev, isActive: data.isActive } : prev);
     } catch { /* silent */ } finally { setToggling(null); }
   };
-
-  const filtered = users.filter((u) =>
-    search === '' ||
-    u.name?.toLowerCase().includes(search.toLowerCase()) ||
-    u.email?.toLowerCase().includes(search.toLowerCase())
-  );
 
   return (
     <AdminLayout>
@@ -119,14 +126,14 @@ export default function UsersPage() {
                   </td>
                 </tr>
               ))
-            ) : filtered.length === 0 ? (
+            ) : users.length === 0 ? (
               <tr><td colSpan={6}>
                 <div className="empty-state">
                   <UserX size={36} />
                   <p>No users found</p>
                 </div>
               </td></tr>
-            ) : filtered.map((user) => (
+            ) : users.map((user) => (
               <tr key={user.id}>
                 <td>
                   <div style={{ display:'flex',alignItems:'center',gap:10 }}>

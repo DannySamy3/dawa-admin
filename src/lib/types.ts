@@ -6,7 +6,8 @@ export type UserRole =
   | 'DISTRIBUTOR'
   | 'MANUFACTURER'
   | 'INSTITUTION'
-  | 'COMMUNITY';
+  | 'COMMUNITY'
+  | 'ORGANICSSUPPLEMENT';
 
 export interface User {
   id: string;
@@ -20,6 +21,7 @@ export interface User {
   distributorProfile?: DistributorProfile | null;
   manufacturerProfile?: ManufacturerProfile | null;
   institutionProfile?: InstitutionProfile | null;
+  organicsSupplementProfile?: OrganicsSupplementProfile | null;
 }
 
 export interface AuthTokens {
@@ -215,7 +217,6 @@ export interface Post {
   }[];
 }
 
-// Some endpoints return different shapes
 export interface PaginatedUsers {
   users?: User[];
   data?: User[];
@@ -227,4 +228,20 @@ export interface PaginatedUsers {
   };
   total?: number;
   page?: number;
+}
+
+export interface OrganicsSupplementProfile extends BaseBusinessProfile {
+  id: string;
+  userId: string;
+  companyName: string;
+  certificationNumber?: string | null;
+  certificationBody?: string | null;
+  productCategories?: unknown;
+  certifications?: unknown;
+  country?: string | null;
+  city?: string | null;
+  physicalAddress?: string | null;
+  user?: User;
+  createdAt: string;
+  updatedAt: string;
 }

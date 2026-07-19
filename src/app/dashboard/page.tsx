@@ -10,6 +10,7 @@ import {
   TrendingUp,
   Activity,
   HeartPulse,
+  Leaf,
 } from 'lucide-react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { StatCard } from '@/components/ui/StatCard';
@@ -24,6 +25,7 @@ interface Stats {
   manufacturers: number;
   institutions: number;
   community: number;
+  organics: number;
 }
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -32,12 +34,13 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<Stats>({
     totalUsers: 0, importers: 0, distributors: 0,
     manufacturers: 0, institutions: 0, community: 0,
+    organics: 0,
   });
   const [loading, setLoading] = useState(true);
 
   const loadStats = useCallback(async () => {
     try {
-      const [users, importers, distributors, manufacturers, institutions, community] =
+      const [users, importers, distributors, manufacturers, institutions, community, organics] =
         await Promise.allSettled([
           adminApi.getUsers(1, 1),
           adminApi.getImporters(1, 1),
@@ -45,6 +48,7 @@ export default function DashboardPage() {
           adminApi.getManufacturers(1, 1),
           adminApi.getInstitutions(1, 1),
           adminApi.getCommunityUsers(1, 1),
+          adminApi.getOrganics(1, 1),
         ]);
 
       const getTotal = (result: PromiseSettledResult<{ data: unknown }>) => {
@@ -60,6 +64,7 @@ export default function DashboardPage() {
         manufacturers: getTotal(manufacturers),
         institutions:  getTotal(institutions),
         community:     getTotal(community),
+        organics:      getTotal(organics),
       });
     } catch { /* silent */ } finally {
       setLoading(false);
@@ -74,6 +79,7 @@ export default function DashboardPage() {
     { name: 'Manufacturers', value: stats.manufacturers },
     { name: 'Institutions',  value: stats.institutions },
     { name: 'Community',     value: stats.community },
+    { name: 'Organics',      value: stats.organics },
   ].filter((d) => d.value > 0);
 
   const barData = MONTHS.slice(0, new Date().getMonth() + 1).map((name, i) => ({
@@ -90,6 +96,7 @@ export default function DashboardPage() {
     { label: 'Manufacturers',  value: stats.manufacturers, icon: <Factory    size={20} color="#f59e0b" />, iconBg: 'rgba(245,158,11,0.15)',  change: 'Pharma manufacturers' },
     { label: 'Institutions',   value: stats.institutions,  icon: <Building2  size={20} color="#f43f5e" />, iconBg: 'rgba(244,63,94,0.15)',   change: 'Pharmacies & hospitals' },
     { label: 'Community',      value: stats.community,     icon: <HeartPulse size={20} color="#a855f7" />, iconBg: 'rgba(168,85,247,0.15)',  change: 'Community members' },
+    { label: 'Organics',       value: stats.organics,      icon: <Leaf       size={20} color="#10b981" />, iconBg: 'rgba(16,185,129,0.15)',  change: 'Organics & supplements' },
   ];
 
   const summaryRows = [
@@ -98,6 +105,7 @@ export default function DashboardPage() {
     { name: 'Manufacturers', count: stats.manufacturers, color: '#f59e0b' },
     { name: 'Institutions',  count: stats.institutions,  color: '#f43f5e' },
     { name: 'Community',     count: stats.community,     color: '#a855f7' },
+    { name: 'Organics',      count: stats.organics,      color: '#10b981' },
   ];
 
   return (

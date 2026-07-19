@@ -4,10 +4,11 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   CheckCircle, XCircle, DollarSign, RefreshCw,
   HeartPulse, AlertCircle, Users, Stethoscope, User,
+  Eye, Power, UserCheck, UserX
 } from 'lucide-react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Modal } from '@/components/ui/Modal';
-import { verifyBadge } from '@/components/ui/Badge';
+import { verifyBadge, roleBadge, statusBadge } from '@/components/ui/Badge';
 import { adminApi } from '@/lib/api';
 import type { Professional } from '@/lib/types';
 
@@ -19,6 +20,7 @@ interface CommunityUser {
   role: string;
   isActive: boolean;
   createdAt: string;
+  updatedAt: string;
   communityProfile?: {
     id: string;
     isProfessional: boolean;
@@ -27,6 +29,7 @@ interface CommunityUser {
     status?: string;
     isVerified?: boolean;
     monthlyFeePaid?: boolean;
+    licenseNumber?: string;
   } | null;
 }
 
@@ -42,6 +45,8 @@ export default function CommunityPage() {
   const [rejectReason, setRejectReason]     = useState('');
   const [actionLoading, setActionLoading]   = useState<string | null>(null);
   const [toast, setToast]                   = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+  const [selectedUser, setSelectedUser]     = useState<CommunityUser | null>(null);
+  const [toggling, setToggling]             = useState<string | null>(null);
 
   const showToast = (msg: string, type: 'success' | 'error') => {
     setToast({ msg, type });
@@ -90,6 +95,22 @@ export default function CommunityPage() {
       load();
     } catch { showToast('Action failed.', 'error'); }
     finally { setActionLoading(null); }
+  };
+
+  const handleToggle = async (userId: string) => {
+    setToggling(userId);
+    try {
+      const { data } = await adminApi.toggleUserStatus(userId);
+      setAllUsers((prev) => prev.map((u) => u.id === userId ? { ...u, isActive: data.isActive } : u));
+      if (selectedUser?.id === userId) {
+        setSelectedUser((prev) => prev ? { ...prev, isActive: data.isActive } : null);
+      }
+      showToast('User status updated successfully', 'success');
+    } catch {
+      showToast('Action failed. Please try again.', 'error');
+    } finally {
+      setToggling(null);
+    }
   };
 
   /* ── Derived lists ────────────────────────────────────────────────── */
@@ -181,13 +202,13 @@ export default function CommunityPage() {
 
       {/* Tab: All Members */}
       {tab === 'all' && (
-        <CommunityTable users={allUsers} loading={loading} showProfessionalType />
+        <CommunityTable users={allUsers} loading={loading} showProfessionalType onView={setSelectedUser} />
       )}
 
       {/* Tab: Professionals */}
       {tab === 'professional' && (
         <div>
-          <CommunityTable users={proUsers} loading={loading} showProfessionalType />
+          <CommunityTable users={proUsers} loading={loading} showProfessionalType onView={setSelectedUser} />
 
           {/* Professional fee management */}
           {proUsers.length > 0 && (
@@ -257,7 +278,7 @@ export default function CommunityPage() {
 
       {/* Tab: Non-Professional */}
       {tab === 'non-professional' && (
-        <CommunityTable users={nonProUsers} loading={loading} showProfessionalType={false} />
+        <CommunityTable users={nonProUsers} loading={loading} showProfessionalType={false} onView={setSelectedUser} />
       )}
 
       {/* Tab: Pending Review */}
@@ -388,17 +409,107 @@ export default function CommunityPage() {
           </div>
         )}
       </Modal>
+
+      {/* Detail Modal */}
+      <Modal title="Community Member Details" open={!!selectedUser} onClose={() => setSelectedUser(null)}
+        footer={
+          <>
+            <button className="btn btn-secondary" onClick={() => setSelectedUser(null)}>Close</button>
+            {selectedUser && (
+              <button
+                className={`btn ${selectedUser.isActive ? 'btn-danger' : 'btn-success'}`}
+                onClick={() => handleToggle(selectedUser.id)}
+                disabled={toggling === selectedUser.id}
+              >
+                {toggling === selectedUser.id ? (
+                  <span className="skeleton" style={{ width: 12, height: 12, borderRadius: '50%' }} />
+                ) : selectedUser.isActive ? (
+                  <><UserX size={14}/> Deactivate</>
+                ) : (
+                  <><UserCheck size={14}/> Activate</>
+                )}
+              </button>
+            )}
+          </>
+        }
+      >
+        {selectedUser && (
+          <div style={{ display:'flex',flexDirection:'column',gap:20 }}>
+            <div style={{ display:'flex',alignItems:'center',gap:14 }}>
+              <div className="user-avatar-lg">{selectedUser.name?.[0]?.toUpperCase() ?? '?'}</div>
+              <div>
+                <div style={{ fontSize:18,fontWeight:700,color:'var(--text-primary)' }}>{selectedUser.name}</div>
+                <div style={{ fontSize:13,color:'var(--text-muted)',marginTop:2 }}>{selectedUser.email}</div>
+                <div style={{ marginTop:6,display:'flex',gap:8,flexWrap:'wrap' }}>
+                  {roleBadge(selectedUser.role)}
+                  {statusBadge(selectedUser.isActive)}
+                  <span className={`badge ${selectedUser.communityProfile?.isProfessional ? 'badge-success' : 'badge-secondary'}`}>
+                    {selectedUser.communityProfile?.isProfessional ? 'Professional' : 'General Member'}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="detail-grid">
+              <div className="detail-row">
+                <div className="detail-label">User ID</div>
+                <div className="detail-value" style={{ fontSize:12,fontFamily:'monospace',wordBreak:'break-all' }}>{selectedUser.id}</div>
+              </div>
+              <div className="detail-row">
+                <div className="detail-label">Account Role</div>
+                <div className="detail-value">{selectedUser.role}</div>
+              </div>
+              <div className="detail-row">
+                <div className="detail-label">Member Since</div>
+                <div className="detail-value">{new Date(selectedUser.createdAt).toLocaleDateString('en-US', { year:'numeric',month:'long',day:'numeric' })}</div>
+              </div>
+              <div className="detail-row">
+                <div className="detail-label">Last Updated</div>
+                <div className="detail-value">{new Date(selectedUser.updatedAt).toLocaleDateString()}</div>
+              </div>
+
+              {selectedUser.communityProfile?.isProfessional && (
+                <>
+                  <div className="detail-row">
+                    <div className="detail-label">Specialty</div>
+                    <div className="detail-value">{selectedUser.communityProfile.professionalType ?? '—'}</div>
+                  </div>
+                  <div className="detail-row">
+                    <div className="detail-label">License Number</div>
+                    <div className="detail-value" style={{ fontFamily:'monospace' }}>{selectedUser.communityProfile.licenseNumber ?? '—'}</div>
+                  </div>
+                  <div className="detail-row">
+                    <div className="detail-label">Verification Status</div>
+                    <div className="detail-value">
+                      {verifyBadge(selectedUser.communityProfile.status ?? 'PENDING')}
+                    </div>
+                  </div>
+                  <div className="detail-row">
+                    <div className="detail-label">Membership Fee</div>
+                    <div className="detail-value">
+                      <span className={`badge ${selectedUser.communityProfile.monthlyFeePaid ? 'badge-success' : 'badge-warning'}`}>
+                        {selectedUser.communityProfile.monthlyFeePaid ? 'Paid' : 'Unpaid'}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </Modal>
     </AdminLayout>
   );
 }
 
 /* ── Shared table sub-component ─────────────────────────────────────── */
 function CommunityTable({
-  users, loading, showProfessionalType,
+  users, loading, showProfessionalType, onView,
 }: {
   users: CommunityUser[];
   loading: boolean;
   showProfessionalType: boolean;
+  onView: (u: CommunityUser) => void;
 }) {
   return (
     <div className="card">
@@ -418,6 +529,7 @@ function CommunityTable({
               <th>Professional</th>
               <th>Status</th>
               <th>Joined</th>
+              <th style={{ width: 80 }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -435,11 +547,12 @@ function CommunityTable({
                   <td><div className="skeleton" style={{ width: 95, height: 18, borderRadius: 10 }} /></td>
                   <td><div className="skeleton" style={{ width: 60, height: 18, borderRadius: 10 }} /></td>
                   <td><div className="skeleton" style={{ width: 80, height: 14 }} /></td>
+                  <td><div className="skeleton" style={{ width: 28, height: 28, borderRadius: 'var(--radius-sm)' }} /></td>
                 </tr>
               ))
             ) : users.length === 0 ? (
               <tr>
-                <td colSpan={showProfessionalType ? 6 : 5}>
+                <td colSpan={showProfessionalType ? 7 : 6}>
                   <div className="empty-state">
                     <Users size={36}/>
                     <p>No users in this category</p>
@@ -474,6 +587,11 @@ function CommunityTable({
                 </td>
                 <td style={{ fontSize:12,color:'var(--text-muted)' }}>
                   {new Date(u.createdAt).toLocaleDateString()}
+                </td>
+                <td>
+                  <button className="btn btn-secondary btn-sm btn-icon" onClick={() => onView(u)} title="View Details">
+                    <Eye size={14} />
+                  </button>
                 </td>
               </tr>
             ))}

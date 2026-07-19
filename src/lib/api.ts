@@ -84,8 +84,8 @@ export const authApi = {
 
 export const adminApi = {
   // Users
-  getUsers: (page = 1, limit = 10, role?: string) =>
-    api.get('/admin/users', { params: { page, limit, role: role || undefined } }),
+  getUsers: (page = 1, limit = 10, role?: string, search?: string) =>
+    api.get('/admin/users', { params: { page, limit, role: role || undefined, search: search || undefined } }),
   getUserById: (id: string) => api.get(`/admin/users/${id}`),
   toggleUserStatus: (id: string) => api.patch(`/admin/users/${id}/toggle-status`),
 
@@ -98,6 +98,8 @@ export const adminApi = {
     api.get('/admin/manufacturers', { params: { page, limit } }),
   getInstitutions: (page = 1, limit = 10) =>
     api.get('/admin/institutions', { params: { page, limit } }),
+  getOrganics: (page = 1, limit = 10) =>
+    api.get('/admin/organics', { params: { page, limit } }),
 
   // Community — all users with COMMUNITY role (professional + non-professional)
   getCommunityUsers: (page = 1, limit = 100) =>

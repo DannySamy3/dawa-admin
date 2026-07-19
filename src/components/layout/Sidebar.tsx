@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   Inbox,
   MessageSquare,
+  Leaf,
 } from 'lucide-react';
 import type { User } from '@/lib/types';
 
@@ -28,6 +29,7 @@ const navItems = [
     { href: '/distributors', icon: Truck, label: 'Distributors' },
     { href: '/manufacturers', icon: Factory, label: 'Manufacturers' },
     { href: '/institutions', icon: Building2, label: 'Institutions' },
+    { href: '/organics', icon: Leaf, label: 'Organics & Supplements' },
   ]},
   { label: 'Platform', items: [
     { href: '/community', icon: HeartPulse, label: 'Community' },
