@@ -116,7 +116,102 @@ export default function DashboardPage() {
       </div>
 
       {loading ? (
-        <div className="spinner-overlay"><div className="spinner" /></div>
+        <>
+          {/* Pulsing Stat cards (6 cards matching the actual layout) */}
+          <div className="stat-grid">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="stat-card">
+                <div className="stat-card-header">
+                  <div className="stat-card-label" style={{ display: 'block', width: '60%' }}>
+                    <div className="skeleton" style={{ width: '100%', height: 12 }} />
+                  </div>
+                  <div className="stat-card-icon">
+                    <div className="skeleton" style={{ width: 42, height: 42, borderRadius: 'var(--radius-sm)' }} />
+                  </div>
+                </div>
+                <div className="stat-card-value">
+                  <div className="skeleton" style={{ width: 70, height: 32 }} />
+                </div>
+                <div className="stat-card-change">
+                  <div className="skeleton" style={{ width: 130, height: 11 }} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Pulsing Charts */}
+          <div className="charts-grid">
+            <div className="card">
+              <div className="card-header">
+                <div>
+                  <div className="card-title">
+                    <div className="skeleton" style={{ width: 150, height: 16 }} />
+                  </div>
+                  <div className="card-subtitle" style={{ marginTop: 4 }}>
+                    <div className="skeleton" style={{ width: 100, height: 12 }} />
+                  </div>
+                </div>
+                <div className="skeleton" style={{ width: 18, height: 18 }} />
+              </div>
+              <div className="card-body" style={{ minHeight: 240, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="skeleton" style={{ width: '100%', height: 220, borderRadius: 'var(--radius-md)' }} />
+              </div>
+            </div>
+
+            <div className="card">
+              <div className="card-header">
+                <div>
+                  <div className="card-title">
+                    <div className="skeleton" style={{ width: 150, height: 16 }} />
+                  </div>
+                  <div className="card-subtitle" style={{ marginTop: 4 }}>
+                    <div className="skeleton" style={{ width: 140, height: 12 }} />
+                  </div>
+                </div>
+                <div className="skeleton" style={{ width: 18, height: 18 }} />
+              </div>
+              <div className="card-body" style={{ minHeight: 240, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="skeleton" style={{ width: '100%', height: 220, borderRadius: 'var(--radius-md)' }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Pulsing Summary Table Card */}
+          <div className="card">
+            <div className="card-header">
+              <div className="card-title">
+                <div className="skeleton" style={{ width: 150, height: 18 }} />
+              </div>
+            </div>
+            <div className="card-body" style={{ padding: '0' }}>
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th><div className="skeleton" style={{ width: 100, height: 14 }} /></th>
+                    <th><div className="skeleton" style={{ width: 80, height: 14 }} /></th>
+                    <th><div className="skeleton" style={{ width: 80, height: 14 }} /></th>
+                    <th><div className="skeleton" style={{ width: 60, height: 14 }} /></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.from({ length: 5 }).map((_, idx) => (
+                    <tr key={idx}>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <div className="skeleton" style={{ width: 8, height: 8, borderRadius: '50%' }} />
+                          <div className="skeleton" style={{ width: 120, height: 14 }} />
+                        </div>
+                      </td>
+                      <td><div className="skeleton" style={{ width: 60, height: 14 }} /></td>
+                      <td><div className="skeleton" style={{ width: 50, height: 14 }} /></td>
+                      <td><div className="skeleton" style={{ width: 60, height: 18, borderRadius: 10 }} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       ) : (
         <>
           {/* Stat cards */}

@@ -5,7 +5,8 @@ export type UserRole =
   | 'IMPORTER'
   | 'DISTRIBUTOR'
   | 'MANUFACTURER'
-  | 'INSTITUTION';
+  | 'INSTITUTION'
+  | 'COMMUNITY';
 
 export interface User {
   id: string;

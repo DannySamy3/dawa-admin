@@ -9,7 +9,7 @@ import { roleBadge, statusBadge } from '@/components/ui/Badge';
 import { adminApi } from '@/lib/api';
 import type { User } from '@/lib/types';
 
-const ROLES = ['ALL', 'ADMIN', 'IMPORTER', 'DISTRIBUTOR', 'MANUFACTURER', 'INSTITUTION'];
+const ROLES = ['ALL', 'ADMIN', 'IMPORTER', 'DISTRIBUTOR', 'MANUFACTURER', 'INSTITUTION', 'COMMUNITY'];
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -99,7 +99,26 @@ export default function UsersPage() {
           </thead>
           <tbody>
             {loading ? (
-              <tr className="loading-row"><td colSpan={6}><div className="spinner" style={{ margin: '0 auto' }} /></td></tr>
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={i}>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div className="skeleton" style={{ width: 32, height: 32, borderRadius: '50%' }} />
+                      <div className="skeleton" style={{ width: 100, height: 14 }} />
+                    </div>
+                  </td>
+                  <td><div className="skeleton" style={{ width: 150, height: 14 }} /></td>
+                  <td><div className="skeleton" style={{ width: 80, height: 18, borderRadius: 10 }} /></td>
+                  <td><div className="skeleton" style={{ width: 60, height: 18, borderRadius: 10 }} /></td>
+                  <td><div className="skeleton" style={{ width: 80, height: 14 }} /></td>
+                  <td>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <div className="skeleton" style={{ width: 28, height: 28, borderRadius: 'var(--radius-sm)' }} />
+                      <div className="skeleton" style={{ width: 28, height: 28, borderRadius: 'var(--radius-sm)' }} />
+                    </div>
+                  </td>
+                </tr>
+              ))
             ) : filtered.length === 0 ? (
               <tr><td colSpan={6}>
                 <div className="empty-state">
@@ -134,7 +153,7 @@ export default function UsersPage() {
                       onClick={() => handleToggle(user.id)}
                       disabled={toggling === user.id}
                     >
-                      {toggling === user.id ? <span className="spinner" style={{ width:12,height:12,borderWidth:2 }} /> : <Power size={14} />}
+                      {toggling === user.id ? <span className="skeleton" style={{ width:12,height:12,borderRadius:'50%' }} /> : <Power size={14} />}
                     </button>
                   </div>
                 </td>

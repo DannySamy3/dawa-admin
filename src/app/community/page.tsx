@@ -237,7 +237,7 @@ export default function CommunityPage() {
                             disabled={actionLoading === prof.id + 'fee'}
                           >
                             {actionLoading === prof.id + 'fee'
-                              ? <span className="spinner" style={{ width:12,height:12,borderWidth:2 }}/>
+                              ? <span className="skeleton" style={{ width: 12, height: 12, borderRadius: '50%' }} />
                               : <DollarSign size={13}/>}
                             Toggle Fee
                           </button>
@@ -284,7 +284,26 @@ export default function CommunityPage() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr className="loading-row"><td colSpan={6}><div className="spinner" style={{ margin:'0 auto' }}/></td></tr>
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <tr key={i}>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <div className="skeleton" style={{ width: 32, height: 32, borderRadius: '50%' }} />
+                          <div className="skeleton" style={{ width: 100, height: 14 }} />
+                        </div>
+                      </td>
+                      <td><div className="skeleton" style={{ width: 120, height: 14 }} /></td>
+                      <td><div className="skeleton" style={{ width: 80, height: 14 }} /></td>
+                      <td><div className="skeleton" style={{ width: 75, height: 18, borderRadius: 10 }} /></td>
+                      <td><div className="skeleton" style={{ width: 80, height: 14 }} /></td>
+                      <td>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <div className="skeleton" style={{ width: 75, height: 28, borderRadius: 'var(--radius-sm)' }} />
+                          <div className="skeleton" style={{ width: 70, height: 28, borderRadius: 'var(--radius-sm)' }} />
+                        </div>
+                      </td>
+                    </tr>
+                  ))
                 ) : pending.length === 0 ? (
                   <tr><td colSpan={6}><div className="empty-state"><CheckCircle size={32} color="var(--accent-success)"/><p>No pending applications 🎉</p></div></td></tr>
                 ) : pending.map((prof) => (
@@ -307,7 +326,7 @@ export default function CommunityPage() {
                           disabled={actionLoading === prof.id + 'APPROVED'}
                         >
                           {actionLoading === prof.id + 'APPROVED'
-                            ? <span className="spinner" style={{ width:12,height:12,borderWidth:2 }}/>
+                            ? <span className="skeleton" style={{ width: 12, height: 12, borderRadius: '50%' }} />
                             : <CheckCircle size={13}/>}
                           Approve
                         </button>
@@ -341,7 +360,7 @@ export default function CommunityPage() {
               disabled={actionLoading === selected?.id + 'REJECTED'}
             >
               {actionLoading === selected?.id + 'REJECTED'
-                ? <span className="spinner" style={{ width:12,height:12,borderWidth:2 }}/>
+                ? <span className="skeleton" style={{ width: 12, height: 12, borderRadius: '50%' }} />
                 : <XCircle size={14}/>}
               Confirm Rejection
             </button>
@@ -403,11 +422,21 @@ function CommunityTable({
           </thead>
           <tbody>
             {loading ? (
-              <tr className="loading-row">
-                <td colSpan={showProfessionalType ? 6 : 5}>
-                  <div className="spinner" style={{ margin:'0 auto' }}/>
-                </td>
-              </tr>
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={i}>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div className="skeleton" style={{ width: 32, height: 32, borderRadius: '50%' }} />
+                      <div className="skeleton" style={{ width: 100, height: 14 }} />
+                    </div>
+                  </td>
+                  <td><div className="skeleton" style={{ width: 150, height: 14 }} /></td>
+                  {showProfessionalType && <td><div className="skeleton" style={{ width: 75, height: 18, borderRadius: 10 }} /></td>}
+                  <td><div className="skeleton" style={{ width: 95, height: 18, borderRadius: 10 }} /></td>
+                  <td><div className="skeleton" style={{ width: 60, height: 18, borderRadius: 10 }} /></td>
+                  <td><div className="skeleton" style={{ width: 80, height: 14 }} /></td>
+                </tr>
+              ))
             ) : users.length === 0 ? (
               <tr>
                 <td colSpan={showProfessionalType ? 6 : 5}>

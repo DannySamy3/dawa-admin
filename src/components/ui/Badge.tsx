@@ -18,6 +18,7 @@ export function roleBadge(role: string) {
     DISTRIBUTOR: 'info',
     MANUFACTURER: 'warning',
     INSTITUTION: 'success',
+    COMMUNITY: 'primary',
   };
   return <Badge variant={map[role] ?? 'primary'}>{role}</Badge>;
 }

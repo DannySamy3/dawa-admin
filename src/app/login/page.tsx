@@ -103,7 +103,7 @@ export default function LoginPage() {
           </div>
 
           <button type="submit" className="btn btn-primary login-btn" disabled={loading}>
-            {loading ? <span className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }} /> : <ShieldCheck size={16} />}
+            {loading ? <span className="skeleton" style={{ width: 16, height: 16, borderRadius: '50%' }} /> : <ShieldCheck size={16} />}
             {loading ? 'Signing in…' : 'Sign In as Admin'}
           </button>
         </form>

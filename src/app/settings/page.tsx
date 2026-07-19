@@ -1,14 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { LogOut, User, Shield, Globe, RefreshCw } from 'lucide-react';
+import { User, RefreshCw } from 'lucide-react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { roleBadge, statusBadge } from '@/components/ui/Badge';
 
 export default function SettingsPage() {
-  const { user, logout, fetchMe } = useAuth();
-  const [apiUrl] = useState(process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api');
+  const { user, fetchMe } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
 
   const handleRefreshProfile = async () => {
@@ -19,23 +18,17 @@ export default function SettingsPage() {
 
   return (
     <AdminLayout>
-      <div className="page-header">
-        <div className="page-header-left">
-          <div className="page-title">Settings</div>
-          <div className="page-subtitle">Account information and preferences</div>
-        </div>
-      </div>
 
-      <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:20,maxWidth:900 }}>
+      <div style={{ maxWidth: 900 }}>
         {/* Profile Card */}
-        <div className="card" style={{ gridColumn:'1/-1' }}>
+        <div className="card">
           <div className="card-header">
             <div style={{ display:'flex',alignItems:'center',gap:8 }}>
               <User size={18} color="var(--accent-primary)"/>
               <div className="card-title">Admin Profile</div>
             </div>
             <button className="btn btn-secondary btn-sm" onClick={handleRefreshProfile} disabled={refreshing}>
-              {refreshing ? <span className="spinner" style={{ width:12,height:12,borderWidth:2 }}/> : <RefreshCw size={13}/>}
+              {refreshing ? <span className="skeleton" style={{ width: 12, height: 12, borderRadius: '50%' }} /> : <RefreshCw size={13}/>}
               Refresh
             </button>
           </div>
@@ -68,63 +61,6 @@ export default function SettingsPage() {
                 <div className="detail-label">Last Updated</div>
                 <div className="detail-value">{user ? new Date(user.updatedAt).toLocaleDateString() : '—'}</div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* API Config */}
-        <div className="card">
-          <div className="card-header">
-            <div style={{ display:'flex',alignItems:'center',gap:8 }}>
-              <Globe size={18} color="var(--accent-info)"/>
-              <div className="card-title">API Configuration</div>
-            </div>
-          </div>
-          <div className="card-body" style={{ display:'flex',flexDirection:'column',gap:14 }}>
-            <div className="detail-row">
-              <div className="detail-label">Backend URL</div>
-              <div className="detail-value" style={{ fontSize:12,fontFamily:'monospace',color:'var(--accent-info)' }}>{apiUrl}</div>
-            </div>
-            <div className="detail-row">
-              <div className="detail-label">Authentication</div>
-              <div className="detail-value">JWT Bearer Token</div>
-            </div>
-            <div className="detail-row">
-              <div className="detail-label">Token Storage</div>
-              <div className="detail-value">localStorage</div>
-            </div>
-            <div className="detail-row">
-              <div className="detail-label">Auto-Refresh</div>
-              <div className="detail-value" style={{ color:'var(--accent-success)' }}>✓ Enabled (on 401)</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Security */}
-        <div className="card">
-          <div className="card-header">
-            <div style={{ display:'flex',alignItems:'center',gap:8 }}>
-              <Shield size={18} color="var(--accent-danger)"/>
-              <div className="card-title">Security</div>
-            </div>
-          </div>
-          <div className="card-body" style={{ display:'flex',flexDirection:'column',gap:14 }}>
-            <div className="detail-row">
-              <div className="detail-label">Access Token TTL</div>
-              <div className="detail-value">30 days</div>
-            </div>
-            <div className="detail-row">
-              <div className="detail-label">Refresh Token TTL</div>
-              <div className="detail-value">7 days</div>
-            </div>
-            <div className="detail-row">
-              <div className="detail-label">Rate Limit</div>
-              <div className="detail-value">100 req / 15 min</div>
-            </div>
-            <div style={{ marginTop:8 }}>
-              <button className="btn btn-danger" style={{ width:'100%',justifyContent:'center' }} onClick={logout}>
-                <LogOut size={15}/> Sign Out
-              </button>
             </div>
           </div>
         </div>

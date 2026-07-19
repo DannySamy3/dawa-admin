@@ -135,7 +135,22 @@ export default function RequestsPage() {
           </thead>
           <tbody>
             {loading ? (
-              <tr className="loading-row"><td colSpan={5}><div className="spinner" style={{ margin:'0 auto' }} /></td></tr>
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={i}>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div className="skeleton" style={{ width: 34, height: 34, borderRadius: 8 }} />
+                      <div className="skeleton" style={{ width: 140, height: 14 }} />
+                    </div>
+                  </td>
+                  <td><div className="skeleton" style={{ width: 85, height: 18, borderRadius: 10 }} /></td>
+                  <td><div className="skeleton" style={{ width: 150, height: 14 }} /></td>
+                  <td><div className="skeleton" style={{ width: 100, height: 14 }} /></td>
+                  <td>
+                    <div className="skeleton" style={{ width: 28, height: 28, borderRadius: 'var(--radius-sm)' }} />
+                  </td>
+                </tr>
+              ))
             ) : paginated.length === 0 ? (
               <tr><td colSpan={5}><div className="empty-state"><Inbox size={36}/><p>No pending requests found</p></div></td></tr>
             ) : paginated.map((req) => {
@@ -178,7 +193,7 @@ export default function RequestsPage() {
                   onClick={() => selected.user && handleVerify(selected.user.id, 'REJECTED')}
                   disabled={actionLoading === selected.user?.id + 'REJECTED'}
                 >
-                  {actionLoading === selected.user?.id + 'REJECTED' ? <span className="spinner" style={{ width:12,height:12,borderWidth:2 }}/> : <XCircle size={14}/>}
+                  {actionLoading === selected.user?.id + 'REJECTED' ? <span className="skeleton" style={{ width: 12, height: 12, borderRadius: '50%' }} /> : <XCircle size={14}/>}
                   Reject
                 </button>
                 <button
@@ -186,7 +201,7 @@ export default function RequestsPage() {
                   onClick={() => selected.user && handleVerify(selected.user.id, 'APPROVED')}
                   disabled={actionLoading === selected.user?.id + 'APPROVED'}
                 >
-                  {actionLoading === selected.user?.id + 'APPROVED' ? <span className="spinner" style={{ width:12,height:12,borderWidth:2 }}/> : <CheckCircle size={14}/>}
+                  {actionLoading === selected.user?.id + 'APPROVED' ? <span className="skeleton" style={{ width: 12, height: 12, borderRadius: '50%' }} /> : <CheckCircle size={14}/>}
                   Approve
                 </button>
               </div>

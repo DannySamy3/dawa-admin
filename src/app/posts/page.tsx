@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Search, RefreshCw, Trash2, CheckCircle, AlertCircle, MessageSquare, Heart, Image as ImageIcon, Grid, List, Eye, Users } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Search, RefreshCw, Trash2, CheckCircle, AlertCircle, MessageSquare, Heart, Image as ImageIcon, Grid, List, Eye, Users, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Pagination } from '@/components/ui/Pagination';
 import { Badge } from '@/components/ui/Badge';
@@ -32,6 +33,12 @@ export default function PostsPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
 
+  // Lightbox
+  const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
+
+  // Pagination for comments
+  const [visibleComments, setVisibleComments] = useState(10);
+
   const LIMIT = 20;
 
   const showToast = (msg: string, type: 'success' | 'error') => {
@@ -61,6 +68,12 @@ export default function PostsPage() {
   useEffect(() => {
     setPage(1);
   }, [selectedRole, sortBy]);
+
+  // Reset lightbox index and visible comments when selected post changes or closes
+  useEffect(() => {
+    setActiveImageIndex(null);
+    setVisibleComments(10);
+  }, [viewPost]);
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -209,7 +222,95 @@ export default function PostsPage() {
       </div>
 
       {loading ? (
-        <div style={{ padding: 60, textAlign: 'center' }}><div className="spinner" style={{ margin: '0 auto' }} /></div>
+        viewMode === 'grid' ? (
+          /* GRID VIEW SKELETON */
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20 }}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} style={{
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-md)',
+                padding: 20,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 16,
+                height: '100%',
+                minHeight: 280
+              }}>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <div className="skeleton" style={{ width: 16, height: 16, borderRadius: 2 }} />
+                  <div className="skeleton" style={{ width: 38, height: 38, borderRadius: '50%', flexShrink: 0 }} />
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div className="skeleton" style={{ width: '60%', height: 14 }} />
+                    <div className="skeleton" style={{ width: '30%', height: 10 }} />
+                  </div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <div className="skeleton" style={{ width: 28, height: 28, borderRadius: 'var(--radius-sm)' }} />
+                    <div className="skeleton" style={{ width: 28, height: 28, borderRadius: 'var(--radius-sm)' }} />
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div className="skeleton" style={{ width: '100%', height: 14 }} />
+                  <div className="skeleton" style={{ width: '90%', height: 14 }} />
+                  <div className="skeleton" style={{ width: '40%', height: 14 }} />
+                </div>
+
+                {i % 2 === 0 && (
+                  <div className="skeleton" style={{ width: '100%', height: 140, borderRadius: 'var(--radius-sm)', marginTop: 'auto' }} />
+                )}
+
+                <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginTop: i % 2 === 0 ? 0 : 'auto', paddingTop: 12, borderTop: '1px solid var(--border-subtle)' }}>
+                  <div className="skeleton" style={{ width: 40, height: 16 }} />
+                  <div className="skeleton" style={{ width: 40, height: 16 }} />
+                  <div className="skeleton" style={{ width: 60, height: 18, borderRadius: 10, marginLeft: 'auto' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* TABLE VIEW SKELETON */
+          <div className="table-wrapper">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th style={{ width: 40 }}><div className="skeleton" style={{ width: 16, height: 16, borderRadius: 2 }} /></th>
+                  <th>Author</th>
+                  <th>Role</th>
+                  <th>Content Preview</th>
+                  <th>Likes</th>
+                  <th>Comments</th>
+                  <th>Posted Date</th>
+                  <th style={{ width: 100 }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <tr key={i}>
+                    <td><div className="skeleton" style={{ width: 16, height: 16, borderRadius: 2 }} /></td>
+                    <td>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <div className="skeleton" style={{ width: 120, height: 14 }} />
+                        <div className="skeleton" style={{ width: 160, height: 11 }} />
+                      </div>
+                    </td>
+                    <td><div className="skeleton" style={{ width: 70, height: 18, borderRadius: 10 }} /></td>
+                    <td><div className="skeleton" style={{ width: 220, height: 14 }} /></td>
+                    <td><div className="skeleton" style={{ width: 20, height: 14 }} /></td>
+                    <td><div className="skeleton" style={{ width: 20, height: 14 }} /></td>
+                    <td><div className="skeleton" style={{ width: 80, height: 14 }} /></td>
+                    <td>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <div className="skeleton" style={{ width: 28, height: 28, borderRadius: 'var(--radius-sm)' }} />
+                        <div className="skeleton" style={{ width: 28, height: 28, borderRadius: 'var(--radius-sm)' }} />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
       ) : filtered.length === 0 ? (
         <div className="empty-state">
           <MessageSquare size={36}/>
@@ -273,7 +374,12 @@ export default function PostsPage() {
                     }}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={post.images[0]} alt="Post media" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img 
+                      src={post.images[0]} 
+                      alt="Post media" 
+                      loading="lazy" 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                    />
                     
                     {post.images.length > 1 && (
                       <div style={{
@@ -382,7 +488,7 @@ export default function PostsPage() {
       >
         {viewPost && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center', paddingBottom: 12, borderBottom: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center', paddingBottom: 12, borderBottom: '1px solid var(--border-subtle)', paddingRight: 44 }}>
               <div style={{ width: 44, height: 44, borderRadius: 22, background: 'var(--bg-active)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 16 }}>
                 {viewPost.user.name.substring(0,2).toUpperCase()}
               </div>
@@ -400,18 +506,160 @@ export default function PostsPage() {
             </div>
 
             {viewPost.images && viewPost.images.length > 0 && (
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: viewPost.images.length === 1 ? '1fr' : 'repeat(auto-fit, minmax(250px, 1fr))', 
-                gap: 12, 
-                marginTop: 8 
-              }}>
-                {viewPost.images.map((img, i) => (
-                  <div key={i} style={{ width: '100%', height: viewPost.images!.length === 1 ? 400 : 250, borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', overflow: 'hidden', background: 'var(--bg-active)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <div style={{ marginTop: 8 }}>
+                {viewPost.images.length === 1 ? (
+                  <div 
+                    onClick={() => setActiveImageIndex(0)}
+                    style={{ 
+                      width: '100%', 
+                      height: 400, 
+                      borderRadius: 'var(--radius-md)', 
+                      border: '1px solid var(--border-subtle)', 
+                      overflow: 'hidden', 
+                      background: 'var(--bg-active)', 
+                      display: 'flex', 
+                      justifyContent: 'center', 
+                      alignItems: 'center',
+                      cursor: 'zoom-in'
+                    }}
+                  >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={img} alt="Attached media" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    <img 
+                      src={viewPost.images[0]} 
+                      alt="Attached media" 
+                      loading="lazy" 
+                      fetchPriority="low" 
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                    />
                   </div>
-                ))}
+                ) : viewPost.images.length === 2 ? (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    {viewPost.images.map((img, idx) => (
+                      <div 
+                        key={idx}
+                        onClick={() => setActiveImageIndex(idx)}
+                        style={{ 
+                          height: 280, 
+                          borderRadius: 'var(--radius-md)', 
+                          border: '1px solid var(--border-subtle)', 
+                          overflow: 'hidden', 
+                          background: 'var(--bg-active)', 
+                          cursor: 'zoom-in'
+                        }}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img 
+                          src={img} 
+                          alt="Attached media" 
+                          loading="lazy" 
+                          fetchPriority="low" 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : viewPost.images.length === 3 ? (
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: '1.2fr 1fr', 
+                    gridTemplateRows: '144px 144px', 
+                    gap: 12 
+                  }}>
+                    <div 
+                      onClick={() => setActiveImageIndex(0)}
+                      style={{ 
+                        gridRow: '1 / 3', 
+                        borderRadius: 'var(--radius-md)', 
+                        border: '1px solid var(--border-subtle)', 
+                        overflow: 'hidden', 
+                        background: 'var(--bg-active)', 
+                        cursor: 'zoom-in'
+                      }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img 
+                        src={viewPost.images[0]} 
+                        alt="Attached media" 
+                        loading="lazy" 
+                        fetchPriority="low" 
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                      />
+                    </div>
+                    {viewPost.images.slice(1, 3).map((img, idx) => (
+                      <div 
+                        key={idx}
+                        onClick={() => setActiveImageIndex(idx + 1)}
+                        style={{ 
+                          borderRadius: 'var(--radius-md)', 
+                          border: '1px solid var(--border-subtle)', 
+                          overflow: 'hidden', 
+                          background: 'var(--bg-active)', 
+                          cursor: 'zoom-in'
+                        }}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img 
+                          src={img} 
+                          alt="Attached media" 
+                          loading="lazy" 
+                          fetchPriority="low" 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: '1fr 1fr', 
+                    gridTemplateRows: '160px 160px', 
+                    gap: 12 
+                  }}>
+                    {viewPost.images.slice(0, 4).map((img, idx) => {
+                      const isLastVisible = idx === 3;
+                      const hasMore = viewPost.images!.length > 4;
+                      return (
+                        <div 
+                          key={idx}
+                          onClick={() => setActiveImageIndex(idx)}
+                          style={{ 
+                            borderRadius: 'var(--radius-md)', 
+                            border: '1px solid var(--border-subtle)', 
+                            overflow: 'hidden', 
+                            background: 'var(--bg-active)', 
+                            cursor: 'zoom-in',
+                            position: 'relative'
+                          }}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img 
+                            src={img} 
+                            alt="Attached media" 
+                            loading="lazy" 
+                            fetchPriority="low" 
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                          />
+                          {isLastVisible && hasMore && (
+                            <div style={{
+                              position: 'absolute',
+                              inset: 0,
+                              background: 'rgba(0,0,0,0.6)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: 'white',
+                              fontSize: 20,
+                              fontWeight: 700,
+                              backdropFilter: 'blur(2px)'
+                            }}>
+                              +{viewPost.images!.length - 4}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
 
@@ -422,9 +670,11 @@ export default function PostsPage() {
 
             {viewPost.comments && viewPost.comments.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 8 }}>
-                <h4 style={{ fontSize: 15, fontWeight: 600, margin: 0, color: 'var(--text-primary)' }}>Comments</h4>
+                <h4 style={{ fontSize: 15, fontWeight: 600, margin: 0, color: 'var(--text-primary)' }}>
+                  Comments ({viewPost.comments.length})
+                </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  {viewPost.comments.map(comment => (
+                  {viewPost.comments.slice(0, visibleComments).map(comment => (
                     <div key={comment.id} style={{ display: 'flex', gap: 12 }}>
                       <div style={{ width: 32, height: 32, borderRadius: 16, background: 'var(--bg-active)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 13, flexShrink: 0 }}>
                         {comment.user.name.substring(0,2).toUpperCase()}
@@ -444,6 +694,25 @@ export default function PostsPage() {
                     </div>
                   ))}
                 </div>
+
+                {viewPost.comments.length > visibleComments && (
+                  <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 8 }}>
+                    <button 
+                      className="btn btn-secondary btn-sm" 
+                      onClick={() => setVisibleComments(prev => prev + 20)}
+                      style={{ fontSize: 12, padding: '8px 16px', borderRadius: 'var(--radius-sm)' }}
+                    >
+                      Load More Comments (+20)
+                    </button>
+                    <button 
+                      className="btn btn-secondary btn-sm" 
+                      onClick={() => setVisibleComments(viewPost.comments.length)}
+                      style={{ fontSize: 12, padding: '8px 16px', borderRadius: 'var(--radius-sm)', background: 'transparent', border: '1px dashed var(--border)' }}
+                    >
+                      Show All ({viewPost.comments.length})
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -456,7 +725,7 @@ export default function PostsPage() {
           <div style={{ display: 'flex', gap: 12, width: '100%', justifyContent: 'flex-end' }}>
             <button className="btn btn-secondary" onClick={() => setDeleteId(null)}>Cancel</button>
             <button className="btn btn-danger" onClick={handleDelete} disabled={actionLoading}>
-              {actionLoading ? <span className="spinner" style={{ width: 14, height: 14 }} /> : <Trash2 size={14} />}
+              {actionLoading ? <span className="skeleton" style={{ width: 14, height: 14, borderRadius: '50%' }} /> : <Trash2 size={14} />}
               Delete Permanently
             </button>
           </div>
@@ -473,7 +742,7 @@ export default function PostsPage() {
           <div style={{ display: 'flex', gap: 12, width: '100%', justifyContent: 'flex-end' }}>
             <button className="btn btn-secondary" onClick={() => setBulkDeleteOpen(false)}>Cancel</button>
             <button className="btn btn-danger" onClick={handleBulkDelete} disabled={actionLoading}>
-              {actionLoading ? <span className="spinner" style={{ width: 14, height: 14 }} /> : <Trash2 size={14} />}
+              {actionLoading ? <span className="skeleton" style={{ width: 14, height: 14, borderRadius: '50%' }} /> : <Trash2 size={14} />}
               Delete {selectedIds.length} Posts
             </button>
           </div>
@@ -483,6 +752,207 @@ export default function PostsPage() {
           Are you sure you want to permanently delete these **{selectedIds.length} selected posts**? This will clean up all associated likes and comments for all selected items. This action cannot be undone.
         </p>
       </Modal>
+
+      {/* LIGHTBOX PORTAL */}
+      {activeImageIndex !== null && viewPost && viewPost.images && (
+        <LightboxPortal
+          images={viewPost.images}
+          activeIndex={activeImageIndex}
+          onClose={() => setActiveImageIndex(null)}
+          onNavigate={setActiveImageIndex}
+        />
+      )}
     </AdminLayout>
+  );
+}
+
+interface LightboxProps {
+  images: string[];
+  activeIndex: number;
+  onClose: () => void;
+  onNavigate: (index: number) => void;
+}
+
+function LightboxPortal({ images, activeIndex, onClose, onNavigate }: LightboxProps) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowLeft' && activeIndex > 0) onNavigate(activeIndex - 1);
+      if (e.key === 'ArrowRight' && activeIndex < images.length - 1) onNavigate(activeIndex + 1);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeIndex, images.length, onClose, onNavigate]);
+
+  return createPortal(
+    <div 
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(5, 8, 16, 0.96)',
+        backdropFilter: 'blur(10px)',
+        zIndex: 3000,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 24,
+        animation: 'fadeIn 0.2s ease',
+      }}
+      onClick={onClose}
+    >
+      {/* Top Header */}
+      <div style={{
+        position: 'absolute',
+        top: 24,
+        left: 24,
+        right: 24,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        color: 'white',
+        zIndex: 3100
+      }}>
+        <div style={{ fontSize: 14, fontWeight: 500, opacity: 0.8 }}>
+          Image {activeIndex + 1} of {images.length}
+        </div>
+        <button 
+          onClick={onClose}
+          style={{
+            background: 'rgba(255,255,255,0.08)',
+            border: 'none',
+            borderRadius: '50%',
+            width: 38,
+            height: 38,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            cursor: 'pointer',
+            transition: 'background 0.2s'
+          }}
+        >
+          <X size={18} />
+        </button>
+      </div>
+
+      {/* Main Image Container */}
+      <div 
+        style={{
+          position: 'relative',
+          width: '100%',
+          maxWidth: '960px',
+          height: '70vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img 
+          src={images[activeIndex]} 
+          alt={`Attached media ${activeIndex + 1}`} 
+          style={{
+            maxHeight: '100%',
+            maxWidth: '100%',
+            objectFit: 'contain',
+            borderRadius: 'var(--radius-md)',
+            boxShadow: '0 30px 70px rgba(0,0,0,0.6)',
+            userSelect: 'none',
+            animation: 'scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+          }}
+        />
+
+        {/* Left Arrow */}
+        {activeIndex > 0 && (
+          <button 
+            onClick={() => onNavigate(activeIndex - 1)}
+            style={{
+              position: 'absolute',
+              left: 16,
+              background: 'rgba(13, 21, 40, 0.8)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '50%',
+              width: 48,
+              height: 48,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              cursor: 'pointer',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+              transition: 'all 0.2s'
+            }}
+          >
+            <ChevronLeft size={22} />
+          </button>
+        )}
+
+        {/* Right Arrow */}
+        {activeIndex < images.length - 1 && (
+          <button 
+            onClick={() => onNavigate(activeIndex + 1)}
+            style={{
+              position: 'absolute',
+              right: 16,
+              background: 'rgba(13, 21, 40, 0.8)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '50%',
+              width: 48,
+              height: 48,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              cursor: 'pointer',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+              transition: 'all 0.2s'
+            }}
+          >
+            <ChevronRight size={22} />
+          </button>
+        )}
+      </div>
+
+      {/* Thumbnails list at bottom */}
+      {images.length > 1 && (
+        <div 
+          style={{
+            display: 'flex',
+            gap: 10,
+            marginTop: 20,
+            zIndex: 3100,
+            background: 'rgba(13, 21, 40, 0.6)',
+            padding: 8,
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid rgba(255,255,255,0.05)',
+            backdropFilter: 'blur(4px)'
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {images.map((img, idx) => (
+            <div 
+              key={idx}
+              onClick={() => onNavigate(idx)}
+              style={{
+                width: 50,
+                height: 50,
+                borderRadius: 'var(--radius-sm)',
+                border: activeIndex === idx ? '2px solid var(--accent-primary)' : '2px solid transparent',
+                overflow: 'hidden',
+                cursor: 'pointer',
+                opacity: activeIndex === idx ? 1 : 0.4,
+                transition: 'all 0.2s'
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>,
+    document.body
   );
 }

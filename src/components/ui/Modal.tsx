@@ -2,7 +2,8 @@
 
 import { X } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface ModalProps {
   title?: string;
@@ -14,15 +15,21 @@ interface ModalProps {
 }
 
 export function Modal({ title, open, onClose, children, footer, maxWidth }: ModalProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     if (open) document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="modal" style={maxWidth ? { maxWidth, width: '100%', position: 'relative' } : { position: 'relative' }}>
         {title ? (
@@ -38,6 +45,7 @@ export function Modal({ title, open, onClose, children, footer, maxWidth }: Moda
         <div className="modal-body">{children}</div>
         {footer && <div className="modal-footer">{footer}</div>}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
