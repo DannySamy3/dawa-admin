@@ -107,10 +107,6 @@ export default function LoginPage() {
             {loading ? 'Signing in…' : 'Sign In as Admin'}
           </button>
         </form>
-
-        <div style={{ marginTop: 24, textAlign: 'center', fontSize: 12, color: 'var(--text-muted)' }}>
-          Protected by JWT authentication · Smart Health Platform v1.0
-        </div>
       </div>
     </div>
   );
