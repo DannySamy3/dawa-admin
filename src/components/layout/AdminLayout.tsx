@@ -25,15 +25,21 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, logout } = useAuth();
   const [apiOnline, setApiOnline] = useState(true);
 
+  const hasNoToken = typeof window !== 'undefined' && !localStorage.getItem('dawa_access_token');
+
   // Auth guard
   useEffect(() => {
+    if (hasNoToken) {
+      router.replace('/login');
+      return;
+    }
     if (!loading && !user) {
-      router.push('/login');
+      router.replace('/login');
     }
     if (!loading && user && user.role !== 'ADMIN') {
-      router.push('/login');
+      router.replace('/login');
     }
-  }, [loading, user, router]);
+  }, [loading, user, router, hasNoToken]);
 
   // Health check every 30s
   useEffect(() => {
@@ -51,6 +57,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   }, []);
 
   const meta = PAGE_META[pathname] ?? { title: 'Smart Health Admin', subtitle: '' };
+
+  if (hasNoToken) {
+    return null;
+  }
 
   if (loading) {
     return (
